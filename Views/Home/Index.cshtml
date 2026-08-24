@@ -1,0 +1,11 @@
+﻿@foreach (var movie in Model)
+{
+    <div class="movie">
+        <img src="@movie.Poster" alt="Тест" width="300" />
+        <h2>@movie.Title</h2>
+        <p><strong>Режиссёр:</strong> @movie.Director</p>
+        <p><strong>Жанр:</strong> @movie.Genre</p>
+        <p><strong>Год:</strong> @movie.Year</p>
+        <p>@movie.Description</p>
+    </div>
+}
