@@ -1,11 +1,26 @@
-﻿@foreach (var movie in Model)
-{
-    <div class="movie">
-        <img src="@movie.Poster" alt="Тест" width="300" />
-        <h2>@movie.Title</h2>
-        <p><strong>Режиссёр:</strong> @movie.Director</p>
-        <p><strong>Жанр:</strong> @movie.Genre</p>
-        <p><strong>Год:</strong> @movie.Year</p>
-        <p>@movie.Description</p>
-    </div>
+﻿@model List<films_dz12._08._2026.Models.Movie>
+
+@{
+    ViewData["Title"] = "Мои фильмы";
 }
+
+<h1 class="movies-title">Мои любимые фильмы</h1>
+
+<div class="movies">
+    @foreach (var movie in Model)
+    {
+        <div class="movie">
+            <img src="@movie.Poster" alt="@movie.Title" />
+
+            <div class="movie-info">
+                <h2>@movie.Title</h2>
+
+                <p><strong>Режиссёр:</strong> @movie.Director</p>
+                <p><strong>Жанр:</strong> @movie.Genre</p>
+                <p><strong>Год:</strong> @movie.Year</p>
+
+                <p>@movie.Description</p>
+            </div>
+        </div>
+    }
+</div>
