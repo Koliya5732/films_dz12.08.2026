@@ -1,0 +1,53 @@
+﻿@model films_dz12._08._2026.Models.Movie
+
+@{
+    ViewData["Title"] = "Удалить фильм";
+}
+
+<h1>Удалить фильм</h1>
+
+<h3>Вы действительно хотите удалить этот фильм?</h3>
+
+<div>
+    @if (!string.IsNullOrEmpty(Model.Poster))
+    {
+        <img src="@Model.Poster"
+             alt="@Model.Title"
+             style="max-width: 200px;" />
+    }
+
+    <h2>@Model.Title</h2>
+
+    <p>
+        <strong>Режиссёр:</strong>
+        @Model.Director
+    </p>
+
+    <p>
+        <strong>Жанр:</strong>
+        @Model.Genre
+    </p>
+
+    <p>
+        <strong>Год:</strong>
+        @Model.Year
+    </p>
+
+    <p>
+        @Model.Description
+    </p>
+</div>
+
+<form asp-action="Delete" method="post">
+
+    <input type="hidden" asp-for="Id" />
+
+    <button type="submit">
+        Да, удалить
+    </button>
+
+    <a asp-controller="Home" asp-action="Index">
+        Отмена
+    </a>
+
+</form>

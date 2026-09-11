@@ -1,36 +1,219 @@
-.movies-title {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.movies {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+.movies-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
     gap: 20px;
 }
 
-.movie {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-    .movie img {
-        width: 100%;
-        height: 350px;
-        object-fit: cover;
+    .movies-header h1 {
+        margin-bottom: 8px;
+        font-size: 38px;
     }
 
+    .movies-header p {
+        margin: 0;
+        color: #777;
+        font-size: 17px;
+    }
+
+.add-button {
+    display: inline-block;
+    padding: 12px 20px;
+    background: #222;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+    .add-button:hover {
+        background: #444;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+.movies {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+}
+
+.movie-card {
+    display: flex;
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+    transition: 0.25s;
+    min-height: 330px;
+}
+
+    .movie-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+    }
+
+.poster-container {
+    width: 150px;
+    min-width: 150px;
+    background: #eee;
+}
+
+.movie-poster {
+    width: 100%;
+    height: 100%;
+    min-height: 330px;
+    object-fit: cover;
+}
+
+.no-poster {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    text-align: center;
+    padding: 10px;
+}
+
 .movie-info {
-    padding: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
     .movie-info h2 {
         margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 23px;
     }
 
-    .movie-info p {
-        margin: 8px 0;
+.movie-details p {
+    margin: 7px 0;
+    font-size: 14px;
+}
+
+.description {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 12px;
+}
+
+.movie-actions {
+    margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.button {
+    padding: 7px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.details-button {
+    background: #222;
+    color: white;
+}
+
+    .details-button:hover {
+        background: #444;
+        color: white;
+    }
+
+.edit-button {
+    background: #eee;
+    color: #222;
+}
+
+    .edit-button:hover {
+        background: #ddd;
+        color: #222;
+    }
+
+.delete-button {
+    background: #f1f1f1;
+    color: #b00020;
+}
+
+    .delete-button:hover {
+        background: #ffe5e5;
+        color: #b00020;
+    }
+
+@media (max-width: 700px) {
+
+    .movies-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .movies {
+        grid-template-columns: 1fr;
+    }
+
+    .movie-card {
+        flex-direction: column;
+    }
+
+    .poster-container {
+        width: 100%;
+        height: 300px;
+    }
+
+    .movie-poster {
+        min-height: 300px;
+    }
+}
+
+
+
+
+
+
+
+.error-page {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.error-code {
+    font-size: 120px;
+    font-weight: bold;
+    line-height: 1;
+    margin-bottom: 20px;
+}
+
+.error-page h1 {
+    font-size: 36px;
+    margin-bottom: 15px;
+}
+
+.error-page p {
+    color: #666;
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+
+.error-button {
+    display: inline-block;
+    padding: 12px 22px;
+    background: #222;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+    .error-button:hover {
+        background: #444;
+        color: white;
     }

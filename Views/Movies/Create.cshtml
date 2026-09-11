@@ -1,0 +1,52 @@
+﻿@model films_dz12._08._2026.Models.Movie
+
+@{
+    ViewData["Title"] = "Добавить фильм";
+}
+
+<h1>Добавить фильм</h1>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+
+    <div>
+        <label asp-for="Title">Название</label>
+        <input asp-for="Title" />
+        <span asp-validation-for="Title"></span>
+    </div>
+
+    <div>
+        <label asp-for="Director">Режиссёр</label>
+        <input asp-for="Director" />
+        <span asp-validation-for="Director"></span>
+    </div>
+
+    <div>
+        <label asp-for="Genre">Жанр</label>
+        <input asp-for="Genre" />
+        <span asp-validation-for="Genre"></span>
+    </div>
+
+    <div>
+        <label asp-for="Year">Год</label>
+        <input asp-for="Year" type="number" />
+        <span asp-validation-for="Year"></span>
+    </div>
+
+    <div>
+        <label asp-for="Description">Описание</label>
+        <textarea asp-for="Description"></textarea>
+        <span asp-validation-for="Description"></span>
+    </div>
+
+    <div>
+        <label>Постер</label>
+        <input type="file" name="posterFile" accept="image/*" />
+    </div>
+
+    <button type="submit">Добавить фильм</button>
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

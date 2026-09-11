@@ -27,6 +27,14 @@ namespace films_dz12._08._2026.Controllers
             return View();
         }
 
+
+        public IActionResult Error404()
+        {
+            Response.StatusCode = 404;
+
+            return View("~/Views/Shared/Error404.cshtml");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

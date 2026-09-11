@@ -85,10 +85,11 @@ namespace films_dz12._08._2026
 
             app.UseHttpsRedirection();
             app.UseRouting();
-
+            app.UseStatusCodePagesWithReExecute("/Home/Error404");
             app.UseAuthorization();
 
             app.MapStaticAssets();
+            app.UseStaticFiles();
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")

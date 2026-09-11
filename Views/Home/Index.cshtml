@@ -4,23 +4,92 @@
     ViewData["Title"] = "Мои фильмы";
 }
 
-<h1 class="movies-title">Мои любимые фильмы</h1>
+<div class="movies-header">
+    <div>
+        <h1>🎬 Мои любимые фильмы</h1>
+        <p>Коллекция фильмов, которые стоит посмотреть</p>
+    </div>
+
+    <a asp-controller="Movies"
+       asp-action="Create"
+       class="add-button">
+        + Добавить фильм
+    </a>
+</div>
 
 <div class="movies">
+
     @foreach (var movie in Model)
     {
-        <div class="movie">
-            <img src="@movie.Poster" alt="@movie.Title" />
+        <div class="movie-card">
+
+            <div class="poster-container">
+                @if (!string.IsNullOrEmpty(movie.Poster))
+                {
+                    <img src="@movie.Poster"
+                         alt="@movie.Title"
+                         class="movie-poster" />
+                }
+                else
+                {
+                    <div class="no-poster">
+                        Нет постера
+                    </div>
+                }
+            </div>
 
             <div class="movie-info">
+
                 <h2>@movie.Title</h2>
 
-                <p><strong>Режиссёр:</strong> @movie.Director</p>
-                <p><strong>Жанр:</strong> @movie.Genre</p>
-                <p><strong>Год:</strong> @movie.Year</p>
+                <div class="movie-details">
+                    <p>
+                        <strong>Режиссёр:</strong>
+                        @movie.Director
+                    </p>
 
-                <p>@movie.Description</p>
+                    <p>
+                        <strong>Жанр:</strong>
+                        @movie.Genre
+                    </p>
+
+                    <p>
+                        <strong>Год:</strong>
+                        @movie.Year
+                    </p>
+                </div>
+
+                <p class="description">
+                    @movie.Description
+                </p>
+
+                <div class="movie-actions">
+
+                    <a asp-controller="Movies"
+                       asp-action="Details"
+                       asp-route-id="@movie.Id"
+                       class="button details-button">
+                        Подробнее
+                    </a>
+
+                    <a asp-controller="Movies"
+                       asp-action="Edit"
+                       asp-route-id="@movie.Id"
+                       class="button edit-button">
+                        Редактировать
+                    </a>
+
+                    <a asp-controller="Movies"
+                       asp-action="Delete"
+                       asp-route-id="@movie.Id"
+                       class="button delete-button">
+                        Удалить
+                    </a>
+
+                </div>
+
             </div>
         </div>
     }
+
 </div>

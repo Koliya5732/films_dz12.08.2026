@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Страница не найдена";
+}
+
+<div class="error-page">
+
+    <div class="error-code">
+        404
+    </div>
+
+    <h1>Страница не найдена</h1>
+
+    <p>
+        К сожалению, такой фильм или раздел не существует.
+    </p>
+
+    <a asp-controller="Home"
+       asp-action="Index"
+       class="error-button">
+        Вернуться на главную
+    </a>
+
+</div>
