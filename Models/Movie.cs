@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using films_dz12._08._2026.Validation;
 
 namespace films_dz12._08._2026.Models
 {
@@ -17,7 +18,7 @@ namespace films_dz12._08._2026.Models
         [Required(ErrorMessage = "Введите жанр")]
         public string Genre { get; set; } = string.Empty;
 
-        [Range(1888, 2100, ErrorMessage = "Введите корректный год")]
+        [MovieYear]
         public int Year { get; set; }
 
         public string? Poster { get; set; }
