@@ -1,23 +1,22 @@
-﻿using films_dz12._08._2026.Data;
-using films_dz12._08._2026.Models;
+﻿using films_dz12._08._2026.Models;
+using films_dz12._08._2026.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace films_dz12._08._2026.Controllers
 {
     public class MoviesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IMovieService _movieService;
 
-        public MoviesController(ApplicationDbContext context)
+        public MoviesController(IMovieService movieService)
         {
-            _context = context;
+            _movieService = movieService;
         }
 
         // GET: Movies
         public async Task<IActionResult> Index()
         {
-            var movies = await _context.Movies.ToListAsync();
+            var movies = await _movieService.GetAllAsync();
 
             return View(movies);
         }
@@ -31,35 +30,13 @@ namespace films_dz12._08._2026.Controllers
         // POST: Movies/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Movie movie, IFormFile? posterFile)
+        public async Task<IActionResult> Create(
+            Movie movie,
+            IFormFile? posterFile)
         {
             if (ModelState.IsValid)
             {
-                if (posterFile != null && posterFile.Length > 0)
-                {
-                    var fileName = Guid.NewGuid().ToString() +
-                                    Path.GetExtension(posterFile.FileName);
-
-                    var folderPath = Path.Combine(
-                        Directory.GetCurrentDirectory(),
-                        "wwwroot",
-                        "images",
-                        "movies");
-
-                    Directory.CreateDirectory(folderPath);
-
-                    var filePath = Path.Combine(folderPath, fileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await posterFile.CopyToAsync(stream);
-                    }
-
-                    movie.Poster = "/images/movies/" + fileName;
-                }
-
-                _context.Movies.Add(movie);
-                await _context.SaveChangesAsync();
+                await _movieService.CreateAsync(movie, posterFile);
 
                 return RedirectToAction("Index", "Home");
             }
@@ -75,8 +52,7 @@ namespace films_dz12._08._2026.Controllers
                 return NotFound();
             }
 
-            var movie = await _context.Movies
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var movie = await _movieService.GetByIdAsync(id.Value);
 
             if (movie == null)
             {
@@ -94,7 +70,7 @@ namespace films_dz12._08._2026.Controllers
                 return NotFound();
             }
 
-            var movie = await _context.Movies.FindAsync(id);
+            var movie = await _movieService.GetByIdAsync(id.Value);
 
             if (movie == null)
             {
@@ -119,76 +95,14 @@ namespace films_dz12._08._2026.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                var existingMovie = await _movieService.GetByIdAsync(id);
+
+                if (existingMovie == null)
                 {
-                    var oldMovie = await _context.Movies
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(m => m.Id == id);
-
-                    if (oldMovie == null)
-                    {
-                        return NotFound();
-                    }
-
-                    // Если загрузили новый постер
-                    if (posterFile != null && posterFile.Length > 0)
-                    {
-                        var fileName = Guid.NewGuid().ToString() +
-                                        Path.GetExtension(posterFile.FileName);
-
-                        var folderPath = Path.Combine(
-                            Directory.GetCurrentDirectory(),
-                            "wwwroot",
-                            "images",
-                            "movies");
-
-                        Directory.CreateDirectory(folderPath);
-
-                        var filePath = Path.Combine(folderPath, fileName);
-
-                        using (var stream = new FileStream(
-                            filePath,
-                            FileMode.Create))
-                        {
-                            await posterFile.CopyToAsync(stream);
-                        }
-
-                        movie.Poster = "/images/movies/" + fileName;
-
-                        // Удаляем старый постер
-                        if (!string.IsNullOrEmpty(oldMovie.Poster) &&
-                            oldMovie.Poster.StartsWith("/images/movies/"))
-                        {
-                            var oldFilePath = Path.Combine(
-                                Directory.GetCurrentDirectory(),
-                                "wwwroot",
-                                oldMovie.Poster.TrimStart('/')
-                                    .Replace('/', Path.DirectorySeparatorChar));
-
-                            if (System.IO.File.Exists(oldFilePath))
-                            {
-                                System.IO.File.Delete(oldFilePath);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // Новый постер не загружали — оставляем старый
-                        movie.Poster = oldMovie.Poster;
-                    }
-
-                    _context.Update(movie);
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MovieExists(movie.Id))
-                    {
-                        return NotFound();
-                    }
 
-                    throw;
-                }
+                await _movieService.UpdateAsync(movie, posterFile);
 
                 return RedirectToAction("Index", "Home");
             }
@@ -204,8 +118,7 @@ namespace films_dz12._08._2026.Controllers
                 return NotFound();
             }
 
-            var movie = await _context.Movies
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var movie = await _movieService.GetByIdAsync(id.Value);
 
             if (movie == null)
             {
@@ -220,38 +133,16 @@ namespace films_dz12._08._2026.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var movie = await _context.Movies.FindAsync(id);
+            var movie = await _movieService.GetByIdAsync(id);
 
             if (movie == null)
             {
-                return View("~/Views/Shared/Error404.cshtml");
+                return NotFound();
             }
 
-            // Удаляем файл постера
-            if (!string.IsNullOrEmpty(movie.Poster) &&
-                movie.Poster.StartsWith("/images/movies/"))
-            {
-                var filePath = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    "wwwroot",
-                    movie.Poster.TrimStart('/')
-                        .Replace('/', Path.DirectorySeparatorChar));
-
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
-                }
-            }
-
-            _context.Movies.Remove(movie);
-            await _context.SaveChangesAsync();
+            await _movieService.DeleteAsync(id);
 
             return RedirectToAction("Index", "Home");
-        }
-
-        private bool MovieExists(int id)
-        {
-            return _context.Movies.Any(e => e.Id == id);
         }
     }
 }

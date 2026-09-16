@@ -1,5 +1,6 @@
 using films_dz12._08._2026.Data;
 using films_dz12._08._2026.Models;
+using films_dz12._08._2026.Services;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -17,7 +18,7 @@ namespace films_dz12._08._2026
                     builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddControllersWithViews();
-
+            builder.Services.AddMovieServices();
             var app = builder.Build();
             using (var scope = app.Services.CreateScope())
             {
