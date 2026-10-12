@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace films_dz12._08._2026.Controllers
 {
-    public class MoviesController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class MoviesController : ControllerBase
     {
         private readonly IMovieService _movieService;
 
@@ -13,125 +15,80 @@ namespace films_dz12._08._2026.Controllers
             _movieService = movieService;
         }
 
-        // GET: Movies
-        public async Task<IActionResult> Index()
+        // GET: api/movies
+        [HttpGet]
+        public async Task<ActionResult<List<Movie>>> GetAll()
         {
             var movies = await _movieService.GetAllAsync();
 
-            return View(movies);
+            return Ok(movies);
         }
 
-        // GET: Movies/Create
-        public IActionResult Create()
+        // GET: api/movies/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Movie>> GetById(int id)
         {
-            return View();
+            var movie = await _movieService.GetByIdAsync(id);
+
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(movie);
         }
 
-        // POST: Movies/Create
+        // POST: api/movies
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(
-            Movie movie,
+        public async Task<ActionResult> Create(
+            [FromForm] Movie movie,
             IFormFile? posterFile)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                await _movieService.CreateAsync(movie, posterFile);
-
-                return RedirectToAction("Index", "Home");
+                return BadRequest(ModelState);
             }
 
-            return View(movie);
+            await _movieService.CreateAsync(movie, posterFile);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = movie.Id },
+                movie);
         }
 
-        // GET: Movies/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var movie = await _movieService.GetByIdAsync(id.Value);
-
-            if (movie == null)
-            {
-                return NotFound();
-            }
-
-            return View(movie);
-        }
-
-        // GET: Movies/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var movie = await _movieService.GetByIdAsync(id.Value);
-
-            if (movie == null)
-            {
-                return NotFound();
-            }
-
-            return View(movie);
-        }
-
-        // POST: Movies/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(
+        // PUT: api/movies/5
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Update(
             int id,
-            Movie movie,
+            [FromForm] Movie movie,
             IFormFile? posterFile)
         {
             if (id != movie.Id)
             {
+                return BadRequest("ID в URL не совпадает с ID фильма.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var existingMovie = await _movieService.GetByIdAsync(id);
+
+            if (existingMovie == null)
+            {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
-                var existingMovie = await _movieService.GetByIdAsync(id);
+            await _movieService.UpdateAsync(movie, posterFile);
 
-                if (existingMovie == null)
-                {
-                    return NotFound();
-                }
-
-                await _movieService.UpdateAsync(movie, posterFile);
-
-                return RedirectToAction("Index", "Home");
-            }
-
-            return View(movie);
+            return Ok(movie);
         }
 
-        // GET: Movies/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var movie = await _movieService.GetByIdAsync(id.Value);
-
-            if (movie == null)
-            {
-                return NotFound();
-            }
-
-            return View(movie);
-        }
-
-        // POST: Movies/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        // DELETE: api/movies/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
         {
             var movie = await _movieService.GetByIdAsync(id);
 
@@ -142,7 +99,7 @@ namespace films_dz12._08._2026.Controllers
 
             await _movieService.DeleteAsync(id);
 
-            return RedirectToAction("Index", "Home");
+            return NoContent();
         }
     }
 }

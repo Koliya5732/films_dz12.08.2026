@@ -37,11 +37,10 @@ namespace films_dz12._08._2026.Services
 
         public async Task UpdateAsync(Movie movie, IFormFile? posterFile)
         {
-            var oldMovie = await _context.Movies
-                .AsNoTracking()
+            var existingMovie = await _context.Movies
                 .FirstOrDefaultAsync(m => m.Id == movie.Id);
 
-            if (oldMovie == null)
+            if (existingMovie == null)
             {
                 return;
             }
@@ -49,15 +48,20 @@ namespace films_dz12._08._2026.Services
             if (posterFile != null && posterFile.Length > 0)
             {
                 movie.Poster = await SavePosterAsync(posterFile);
-
-                DeletePoster(oldMovie.Poster);
+                DeletePoster(existingMovie.Poster);
             }
-            else
+
+            existingMovie.Title = movie.Title;
+            existingMovie.Director = movie.Director;
+            existingMovie.Genre = movie.Genre;
+            existingMovie.Year = movie.Year;
+            existingMovie.Description = movie.Description;
+
+            if (posterFile != null && posterFile.Length > 0)
             {
-                movie.Poster = oldMovie.Poster;
+                existingMovie.Poster = movie.Poster;
             }
 
-            _context.Movies.Update(movie);
             await _context.SaveChangesAsync();
         }
 

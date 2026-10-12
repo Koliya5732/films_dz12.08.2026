@@ -2,7 +2,7 @@ using films_dz12._08._2026.Data;
 using films_dz12._08._2026.Models;
 using films_dz12._08._2026.Services;
 using Microsoft.EntityFrameworkCore;
-
+using Scalar.AspNetCore;
 
 
 namespace films_dz12._08._2026
@@ -17,8 +17,17 @@ namespace films_dz12._08._2026
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             builder.Services.AddControllersWithViews();
-            builder.Services.AddMovieServices();
+            builder.Services.AddControllers();
+            builder.Services.AddOpenApi();
             var app = builder.Build();
             using (var scope = app.Services.CreateScope())
             {
@@ -86,11 +95,19 @@ namespace films_dz12._08._2026
 
             app.UseHttpsRedirection();
             app.UseRouting();
+
+            app.UseSession();
+
             app.UseStatusCodePagesWithReExecute("/Home/Error404");
             app.UseAuthorization();
 
             app.MapStaticAssets();
             app.UseStaticFiles();
+
+            app.MapControllers();
+            app.MapOpenApi();
+            app.MapScalarApiReference();
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
