@@ -3,6 +3,7 @@ using films_dz12._08._2026.Models;
 using films_dz12._08._2026.Services;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using films_dz12._08._2026.Repositories;
 
 
 namespace films_dz12._08._2026
@@ -16,6 +17,7 @@ namespace films_dz12._08._2026
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession(options =>

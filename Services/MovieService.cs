@@ -1,44 +1,47 @@
-﻿using films_dz12._08._2026.Data;
-using films_dz12._08._2026.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using films_dz12._08._2026.Models;
+using films_dz12._08._2026.Repositories;
 
 namespace films_dz12._08._2026.Services
 {
     public class MovieService : IMovieService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public MovieService(ApplicationDbContext context)
+        public MovieService(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<List<Movie>> GetAllAsync()
         {
-            return await _context.Movies.ToListAsync();
+            var movies = await _unitOfWork.Movies.GetAllAsync();
+            return movies.ToList();
         }
 
         public async Task<Movie?> GetByIdAsync(int id)
         {
-            return await _context.Movies
-                .FirstOrDefaultAsync(m => m.Id == id);
+            return await _unitOfWork.Movies.GetByIdAsync(id);
         }
 
-        public async Task CreateAsync(Movie movie, IFormFile? posterFile)
+        public async Task CreateAsync(
+            Movie movie,
+            IFormFile? posterFile)
         {
             if (posterFile != null && posterFile.Length > 0)
             {
                 movie.Poster = await SavePosterAsync(posterFile);
             }
 
-            _context.Movies.Add(movie);
-            await _context.SaveChangesAsync();
+            await _unitOfWork.Movies.AddAsync(movie);
+            await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Movie movie, IFormFile? posterFile)
+        public async Task UpdateAsync(
+            Movie movie,
+            IFormFile? posterFile)
         {
-            var existingMovie = await _context.Movies
-                .FirstOrDefaultAsync(m => m.Id == movie.Id);
+            var existingMovie =
+                await _unitOfWork.Movies.GetByIdAsync(movie.Id);
 
             if (existingMovie == null)
             {
@@ -47,8 +50,11 @@ namespace films_dz12._08._2026.Services
 
             if (posterFile != null && posterFile.Length > 0)
             {
-                movie.Poster = await SavePosterAsync(posterFile);
+                var newPoster = await SavePosterAsync(posterFile);
+
                 DeletePoster(existingMovie.Poster);
+
+                existingMovie.Poster = newPoster;
             }
 
             existingMovie.Title = movie.Title;
@@ -57,17 +63,13 @@ namespace films_dz12._08._2026.Services
             existingMovie.Year = movie.Year;
             existingMovie.Description = movie.Description;
 
-            if (posterFile != null && posterFile.Length > 0)
-            {
-                existingMovie.Poster = movie.Poster;
-            }
-
-            await _context.SaveChangesAsync();
+            _unitOfWork.Movies.Update(existingMovie);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var movie = await _context.Movies.FindAsync(id);
+            var movie = await _unitOfWork.Movies.GetByIdAsync(id);
 
             if (movie == null)
             {
@@ -76,11 +78,12 @@ namespace films_dz12._08._2026.Services
 
             DeletePoster(movie.Poster);
 
-            _context.Movies.Remove(movie);
-            await _context.SaveChangesAsync();
+            _unitOfWork.Movies.Delete(movie);
+            await _unitOfWork.SaveChangesAsync();
         }
 
-        private async Task<string> SavePosterAsync(IFormFile posterFile)
+        private async Task<string> SavePosterAsync(
+            IFormFile posterFile)
         {
             var fileName = Guid.NewGuid().ToString() +
                            Path.GetExtension(posterFile.FileName);
